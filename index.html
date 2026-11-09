@@ -148,6 +148,40 @@ td.num{font-weight:500}
   .bar-row{grid-template-columns:84px 1fr 100px}
   header h1{font-size:30px}
 }
+
+/* ---- clean grouped form ---- */
+.in-layout{display:grid;gap:8px}
+@media (min-width:900px){ .in-layout{grid-template-columns:1.4fr 1fr;gap:28px;align-items:start} .in-side{position:sticky;top:20px} }
+.sec-head{font-size:22px;font-weight:700;margin:6px 4px 10px;display:flex;align-items:center;gap:10px}
+.sec-head.sub{font-size:13px;font-weight:400;color:var(--sub);text-transform:none;margin:22px 16px 8px}
+.sec-head.sub span{opacity:.7}
+.group{background:var(--card);border-radius:12px;overflow:hidden}
+.group.pad{padding:18px 18px 16px}
+.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:0 16px;position:relative}
+.row::after{content:"";position:absolute;left:16px;right:0;bottom:0;border-bottom:.5px solid var(--line)}
+.group > .row:last-child::after,.group > :last-child.row::after{display:none}
+.row .lab{width:84px;flex:none;font-size:17px;color:var(--ink);font-weight:500}
+.row input{flex:1;background:transparent!important;padding:15px 0;border-radius:0;box-shadow:none!important;font-size:17px;min-width:0}
+.row input:focus{background:transparent}
+.row:focus-within .lab{color:var(--accent)}
+.row .suffix{color:var(--sub);font-size:17px}
+.row .seg{flex:1;max-width:260px;margin-left:auto}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding:0 16px 12px;margin-top:-4px;scrollbar-width:none;position:relative}
+.chips.scroll::-webkit-scrollbar{display:none}
+.chips.scroll .chip{flex:none;background:var(--fill2);font-size:15px;padding:7px 14px}
+.chips.scroll .chip.on{background:var(--accent);color:#fff}
+.group > .chips.scroll{border-bottom:.5px solid var(--line);margin-left:0}
+.group .warn{padding:0 16px 10px}
+.row:has(+ .chips)::after,.row:has(+ .warn:not(.hidden))::after{display:none}
+.chips.scroll::after{content:"";flex:none;width:4px}
+.btn.big{margin-top:22px;padding:16px;font-size:18px;border-radius:14px}
+.now-total{font-size:40px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.now-count{color:var(--sub);font-size:15px;margin-top:2px}
+#recent .r-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;position:relative;font-size:16px}
+#recent .r-item + .r-item::before{content:"";position:absolute;left:16px;right:0;top:0;border-top:.5px solid var(--line)}
+#recent .r-item small{display:block;color:var(--sub);font-size:13px;margin-top:2px}
+#recent .r-item b{font-weight:600;font-variant-numeric:tabular-nums}
+#recent .r-no{color:var(--sub);font-size:14px;width:28px;flex:none}
 </style>
 </head>
 <body>
@@ -160,14 +194,6 @@ td.num{font-weight:500}
   <div class="backup card need" id="installBox" style="display:none">
     <div class="b-line">⚠ 아직 앱으로 설치되지 않았어요. 사파리 <b>공유 버튼(□↑) → '홈 화면에 추가'</b>를 누른 뒤, 홈 화면의 <b>축의금 장부</b> 아이콘으로 열어서 쓰세요. (사파리에서 입력한 내용은 앱으로 옮겨지지 않아요)</div>
   </div>
-  <div class="backup card" id="backupBox">
-    <div class="b-line"><span id="backupState"></span></div>
-    <div class="row-btns" style="margin-top:8px">
-      <button class="btn ghost sm" id="linkBtn">백업 보내기</button>
-      <button class="btn ghost sm" id="loadBtn">백업에서 불러오기</button>
-    </div>
-    <input type="file" id="loadFile" accept=".json,application/json" class="hidden">
-  </div>
 
   <div class="tabs">
     <button data-tab="input" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 8.5l9 5.5 9-5.5"/></svg><span>입력</span></button>
@@ -177,62 +203,47 @@ td.num{font-weight:500}
 
   <!-- 입력 -->
   <section id="tab-input">
-    <div class="card">
-      <h2><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></h2>
-      <form id="form" autocomplete="off">
-        <div class="grid">
-          <div>
-            <label>봉투 번호</label>
-            <input id="f-no" inputmode="numeric" placeholder="자동">
-          </div>
-          <div>
-            <label>구분</label>
-            <div class="seg" id="f-side">
-              <button type="button" data-v="신부측" class="on">신부측</button>
-              <button type="button" data-v="신랑측">신랑측</button>
-            </div>
-          </div>
-          <div class="full">
-            <label>이름</label>
-            <input id="f-name" placeholder="예: 홍길동 (부부면 '홍길동·김영희')" required>
-            <div class="warn hidden" id="dupWarn"></div>
-          </div>
-          <div class="full">
-            <label>금액 (만원 단위로 입력)</label>
-            <div class="amt-wrap"><input id="f-amt" inputmode="decimal" placeholder="예: 5"><span>만원</span></div>
-            <div class="amt-preview" id="amtPreview"></div>
-            <div class="chips" id="amtChips"></div>
-          </div>
-          <div class="full">
-            <label>관계</label>
-            <input id="f-rel" placeholder="직접 입력하거나 아래에서 선택">
-            <div class="chips" id="relChips"></div>
-          </div>
-          <div>
-            <label>식권 (장)</label>
-            <input id="f-ticket" inputmode="numeric" placeholder="0">
-          </div>
-          <div>
-            <label>답례품</label>
-            <div class="seg" id="f-gift">
-              <button type="button" data-v="0" class="on">안 줌</button>
-              <button type="button" data-v="1">줌</button>
-            </div>
-          </div>
-          <div class="full">
-            <label>메모</label>
-            <input id="f-memo" placeholder="예: 화환도 보냄, 계좌이체, 대리 전달(○○ 통해)">
+    <div class="in-layout">
+      <form id="form" autocomplete="off" class="in-form">
+        <div class="sec-head"><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></div>
+        <div class="group">
+          <div class="row"><span class="lab">이름</span><input id="f-name" placeholder="홍길동" required></div>
+          <div class="warn hidden" id="dupWarn"></div>
+          <div class="row"><span class="lab">금액</span><input id="f-amt" inputmode="decimal" placeholder="0"><span class="suffix">만원</span></div>
+          <div class="chips scroll" id="amtChips"></div>
+          <div class="row"><span class="lab">관계</span><input id="f-rel" placeholder="선택 또는 입력"></div>
+          <div class="chips scroll" id="relChips"></div>
+          <div class="row"><span class="lab">구분</span>
+            <div class="seg" id="f-side"><button type="button" data-v="신부측" class="on">신부측</button><button type="button" data-v="신랑측">신랑측</button></div>
           </div>
         </div>
-        <div style="margin-top:14px">
-          <button class="btn primary" type="submit" id="saveBtn">저장</button>
-          <div class="row-btns hidden" id="editBtns">
-            <button class="btn ghost" type="button" id="cancelEdit">취소</button>
-            <button class="btn danger" type="button" id="delBtn">삭제</button>
+        <div class="sec-head sub">추가 정보 <span>(선택)</span></div>
+        <div class="group">
+          <div class="row"><span class="lab">봉투 번호</span><input id="f-no" inputmode="numeric" placeholder="자동"></div>
+          <div class="row"><span class="lab">식권</span><input id="f-ticket" inputmode="numeric" placeholder="0"><span class="suffix">장</span></div>
+          <div class="row"><span class="lab">답례품</span>
+            <div class="seg" id="f-gift"><button type="button" data-v="0" class="on">안 줌</button><button type="button" data-v="1">줌</button></div>
           </div>
+          <div class="row"><span class="lab">메모</span><input id="f-memo" placeholder="화환, 계좌이체, 대리 전달 등"></div>
+        </div>
+        <div class="amt-preview hidden" id="amtPreview"></div>
+        <button class="btn primary big" type="submit" id="saveBtn">저장</button>
+        <div class="row-btns hidden" id="editBtns">
+          <button class="btn ghost" type="button" id="cancelEdit">취소</button>
+          <button class="btn danger" type="button" id="delBtn">삭제</button>
         </div>
       </form>
-      <div class="recent" id="recent"></div>
+      <aside class="in-side">
+        <div class="sec-head">현황</div>
+        <div class="group pad">
+          <div class="now-total" id="nowTotal">0원</div>
+          <div class="now-count" id="nowCount">아직 입력된 봉투가 없어요</div>
+        </div>
+        <div id="recentWrap" class="hidden">
+          <div class="sec-head sub">방금 입력</div>
+          <div class="group" id="recent"></div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -267,6 +278,15 @@ td.num{font-weight:500}
 
   <!-- 합계 -->
   <section id="tab-sum" class="hidden">
+  <div class="backup card" id="backupBox">
+    <div class="b-line"><span id="backupState"></span></div>
+    <div class="row-btns" style="margin-top:8px">
+      <button class="btn ghost sm" id="linkBtn">백업 보내기</button>
+      <button class="btn ghost sm" id="loadBtn">백업에서 불러오기</button>
+    </div>
+    <input type="file" id="loadFile" accept=".json,application/json" class="hidden">
+  </div>
+
     <div class="kpis">
       <div class="kpi main"><div class="k">총 축의금</div><div class="v" id="kTotal">0원</div></div>
       <div class="kpi"><div class="k">봉투 수</div><div class="v" id="kCount">0</div></div>
@@ -318,7 +338,7 @@ td.num{font-weight:500}
 <script>
 (function(){
 const DEFAULT_RELS = ["신부 친구","신부 직장","신부 학교","부모님 지인","친척","신랑 친구","신랑 직장","기타"];
-const AMTS = [3,5,7,10,15,20,30,50];
+const AMTS = [3,5,10,15,20,30,50,100];
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const won = n => (Math.round(n)||0).toLocaleString("ko-KR") + "원";
@@ -613,9 +633,12 @@ $("#saveSettings").onclick = async ()=>{
 };
 
 function renderRecent(){
-  const r=[...gifts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
-  $("#recent").innerHTML = r.length ? `<div style="border:0;padding-bottom:2px"><span>최근 입력</span><span>총 ${gifts.length}건 · ${won(stats().total)}</span></div>`+
-    r.map(g=>`<div><span>${g.no}번 ${esc(g.name)}${g.rel?" · "+esc(g.rel):""}</span><span>${manwon(g.amount)}</span></div>`).join("") : "";
+  const st=stats();
+  $("#nowTotal").textContent=won(st.total);
+  $("#nowCount").textContent= st.count ? `봉투 ${st.count}건 · 평균 ${manwon(Math.round(st.avg/1000)*1000)}` : "아직 입력된 봉투가 없어요";
+  const r=[...gifts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,6);
+  $("#recentWrap").classList.toggle("hidden", !r.length);
+  $("#recent").innerHTML = r.map(g=>`<div class="r-item"><span class="r-no">${g.no}</span><span style="flex:1">${esc(g.name)}${g.rel?`<small>${esc(g.rel)}${g.side==="신랑측"?" · 신랑측":""}</small>`:""}</span><b>${manwon(g.amount)}</b></div>`).join("");
 }
 function renderAll(){
   renderRelFilter(); renderList(); renderSum(); renderRecent();
