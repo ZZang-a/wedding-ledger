@@ -13,6 +13,7 @@
 <link rel="manifest" href="manifest.json">
 <script src="xlsx.full.min.js"></script>
 <style>
+@font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;src:url("PretendardVariable.woff2") format("woff2-variations");}
 :root{
   --bg:#f2f2f7; --card:#ffffff; --ink:#000; --sub:rgba(60,60,67,.6); --line:rgba(60,60,67,.18);
   --fill:rgba(118,118,128,.12); --fill2:rgba(118,118,128,.08);
@@ -27,10 +28,10 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:17px;letter-spacing:-.2px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-.wrap{max-width:860px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:17px;letter-spacing:-.2px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left))}
 header{padding:18px 4px 10px}
-header h1{font-family:-apple-system,"SF Pro Display","Apple SD Gothic Neo",sans-serif;font-weight:700;font-size:34px;letter-spacing:.2px;margin:0;line-height:1.15}
+header h1{font-family:inherit;font-weight:700;font-size:34px;letter-spacing:.2px;margin:0;line-height:1.15}
 header .sub{color:var(--sub);font-size:15px;margin-top:4px}
 .status{font-size:13px;color:var(--sub);margin:0 4px 14px;display:flex;align-items:center;gap:6px}
 .status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
@@ -151,8 +152,8 @@ td.num{font-weight:500}
 
 /* ---- clean grouped form ---- */
 .in-layout{display:grid;gap:8px}
-@media (min-width:900px){ .in-layout{grid-template-columns:1.4fr 1fr;gap:28px;align-items:start} .in-side{position:sticky;top:20px} }
-.sec-head{font-size:22px;font-weight:700;margin:6px 4px 10px;display:flex;align-items:center;gap:10px}
+
+.sec-head{font-size:22px;font-weight:700;margin:22px 4px 10px;display:flex;align-items:center;gap:10px}
 .sec-head.sub{font-size:13px;font-weight:400;color:var(--sub);text-transform:none;margin:22px 16px 8px}
 .sec-head.sub span{opacity:.7}
 .group{background:var(--card);border-radius:12px;overflow:hidden}
@@ -166,17 +167,19 @@ td.num{font-weight:500}
 .row:focus-within .lab{color:var(--accent)}
 .row .suffix{color:var(--sub);font-size:17px}
 .row .seg{flex:1;max-width:260px;margin-left:auto}
-.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding:0 16px 12px;margin-top:-4px;scrollbar-width:none;position:relative}
+.chips.scroll{flex-wrap:wrap;padding:2px 16px 14px;margin-top:-6px;gap:8px}
 .chips.scroll::-webkit-scrollbar{display:none}
 .chips.scroll .chip{flex:none;background:var(--fill2);font-size:15px;padding:7px 14px}
 .chips.scroll .chip.on{background:var(--accent);color:#fff}
 .group > .chips.scroll{border-bottom:.5px solid var(--line);margin-left:0}
 .group .warn{padding:0 16px 10px}
 .row:has(+ .chips)::after,.row:has(+ .warn:not(.hidden))::after{display:none}
-.chips.scroll::after{content:"";flex:none;width:4px}
+
 .btn.big{margin-top:22px;padding:16px;font-size:18px;border-radius:14px}
-.now-total{font-size:40px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-.now-count{color:var(--sub);font-size:15px;margin-top:2px}
+.sumcard{background:var(--card);border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.sum-k{font-size:14px;color:var(--sub);margin-bottom:2px}
+.now-total{font-size:34px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.15}
+.now-count{color:var(--sub);font-size:15px;padding-bottom:4px}
 #recent .r-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;position:relative;font-size:16px}
 #recent .r-item + .r-item::before{content:"";position:absolute;left:16px;right:0;top:0;border-top:.5px solid var(--line)}
 #recent .r-item small{display:block;color:var(--sub);font-size:13px;margin-top:2px}
@@ -204,6 +207,10 @@ td.num{font-weight:500}
   <!-- 입력 -->
   <section id="tab-input">
     <div class="in-layout">
+      <div class="sumcard">
+        <div><div class="sum-k">지금까지 받은 축의금</div><div class="now-total" id="nowTotal">0원</div></div>
+        <div class="now-count" id="nowCount">아직 입력된 봉투가 없어요</div>
+      </div>
       <form id="form" autocomplete="off" class="in-form">
         <div class="sec-head"><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></div>
         <div class="group">
@@ -233,17 +240,10 @@ td.num{font-weight:500}
           <button class="btn danger" type="button" id="delBtn">삭제</button>
         </div>
       </form>
-      <aside class="in-side">
-        <div class="sec-head">현황</div>
-        <div class="group pad">
-          <div class="now-total" id="nowTotal">0원</div>
-          <div class="now-count" id="nowCount">아직 입력된 봉투가 없어요</div>
-        </div>
-        <div id="recentWrap" class="hidden">
-          <div class="sec-head sub">방금 입력</div>
-          <div class="group" id="recent"></div>
-        </div>
-      </aside>
+      <div id="recentWrap" class="hidden">
+        <div class="sec-head sub">방금 입력</div>
+        <div class="group" id="recent"></div>
+      </div>
     </div>
   </section>
 
