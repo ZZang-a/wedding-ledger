@@ -15,235 +15,264 @@
 <style>
 @font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;src:url("PretendardVariable.woff2") format("woff2-variations");}
 :root{
-  --bg:#f2f2f7; --card:#ffffff; --ink:#000; --sub:rgba(60,60,67,.6); --line:rgba(60,60,67,.18);
-  --fill:rgba(118,118,128,.12); --fill2:rgba(118,118,128,.08);
-  --accent:#007aff; --accent-d:#0062cc; --accent-l:rgba(0,122,255,.12);
-  --ok:#34c759; --okt:#248a3d; --warn:#ff3b30; --orange:#ff9500; --radius:12px;
-  --bar:rgba(249,249,249,.86);
-}
-@media (prefers-color-scheme:dark){
-  :root{ --bg:#000; --card:#1c1c1e; --ink:#fff; --sub:rgba(235,235,245,.6); --line:rgba(84,84,88,.6);
-    --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.18);
-    --accent:#0a84ff; --accent-d:#409cff; --accent-l:rgba(10,132,255,.2); --ok:#30d158; --okt:#30d158; --warn:#ff453a; --bar:rgba(22,22,24,.86); }
+  --bg:#fff; --card:#fff; --ink:#111827; --sub:#6b7280; --mute:#9ca3af; --line:#e5e7eb; --soft:#f3f4f6; --soft2:#f9fafb;
+  --brand:#063f35; --green:#16a34a; --green-l:#dcfce7; --red:#e5484d; --red-l:#fee2e2; --blue:#2563eb; --orange:#d97706; --orange-l:#fef3c7;
+  --radius:12px;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:17px;letter-spacing:-.2px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-.wrap{max-width:680px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left))}
-header{padding:18px 4px 10px}
-header h1{font-family:inherit;font-weight:700;font-size:34px;letter-spacing:.2px;margin:0;line-height:1.15}
-header .sub{color:var(--sub);font-size:15px;margin-top:4px}
-.status{font-size:13px;color:var(--sub);margin:0 4px 14px;display:flex;align-items:center;gap:6px}
-.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
-.status.bad{color:var(--warn)} .status.bad::before{background:var(--warn)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;letter-spacing:-.2px;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:1240px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left))}
+.hidden{display:none!important}
 
-/* bottom tab bar */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:0;
-  background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
-  border-top:.5px solid var(--line);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
-.tabs button{flex:0 1 180px;border:0;background:none;padding:4px 0;font:inherit;font-size:11px;font-weight:500;color:rgba(128,128,128,.9);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
-.tabs button svg{width:26px;height:26px}
-.tabs button.on{color:var(--accent)}
-@media (min-width:700px){ .tabs button{flex-direction:row;justify-content:center;font-size:14px;gap:8px;padding:10px 0} .tabs button svg{width:22px;height:22px} }
+/* top pill nav */
+.tabs{display:flex;justify-content:center;gap:4px;width:max-content;margin:4px auto 26px;padding:5px;border-radius:99px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.06);position:sticky;top:calc(10px + env(safe-area-inset-top));z-index:20}
+.tabs button{border:0;background:none;padding:9px 18px;border-radius:99px;font:inherit;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:7px}
+.tabs button svg{width:18px;height:18px}
+.tabs button.on{background:#111;color:#fff}
 
-/* inset grouped cards */
-.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:22px;border:0}
-.card h2{font-size:13px;font-weight:400;text-transform:uppercase;color:var(--sub);margin:-4px 0 12px;display:flex;justify-content:space-between;align-items:center;letter-spacing:0}
-#tab-input .card h2{font-size:22px;font-weight:700;text-transform:none;color:var(--ink);margin:0 0 14px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.full{grid-column:1/-1}
-label{display:block;font-size:13px;color:var(--sub);margin:0 0 6px 2px;font-weight:400}
-input,select,textarea{width:100%;font:inherit;font-size:17px;padding:12px 14px;border:0;border-radius:10px;background:var(--fill2);color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;transition:box-shadow .15s}
-input::placeholder{color:rgba(128,128,128,.7)}
-input:focus,select:focus{box-shadow:0 0 0 3px var(--accent-l);background:var(--card)}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{border:0;background:var(--fill);border-radius:99px;padding:8px 15px;font:inherit;font-size:15px;cursor:pointer;color:var(--ink);transition:background .15s,transform .1s}
-.chip:active{transform:scale(.96)}
-.chip.on{background:var(--accent);color:#fff}
-/* iOS segmented control */
-.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
-.seg button{flex:1;border:0;background:transparent;padding:9px 0;font:inherit;font-size:15px;font-weight:500;cursor:pointer;color:var(--ink);border-radius:7px;transition:background .2s,box-shadow .2s}
-.seg button.on{background:var(--card);box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04);font-weight:600}
-@media (prefers-color-scheme:dark){ .seg button.on{background:#636366} }
+/* title */
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 2px 6px}
+header h1{font-size:34px;font-weight:800;margin:0;letter-spacing:-.8px}
+.badge{background:#15803d;color:#fff;font-size:13px;font-weight:700;padding:5px 11px;border-radius:99px}
+header .sub{flex-basis:100%;color:var(--sub);font-size:14px;margin-top:-2px}
+.status{font-size:12.5px;color:var(--mute);margin:0 2px 20px;display:flex;align-items:center;gap:6px}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
+.status.bad{color:var(--red)} .status.bad::before{background:var(--red)}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.card-h,.card h2{font-size:17px;font-weight:700;margin:0 0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--ink);text-transform:none}
+.sec-title{font-size:19px;font-weight:700;margin:30px 2px 12px}
+.k{font-size:13px;color:var(--sub);margin-bottom:6px}
+
+/* dashboard grid */
+.dash{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.side{position:sticky;top:84px}
+@media (max-width:1000px){ .dash{grid-template-columns:1fr} .side{position:static} }
+.split{display:grid;grid-template-columns:1fr 1fr;padding:0}
+.split .pane{padding:22px}
+.split .pane + .pane{border-left:1px solid var(--line)}
+@media (max-width:760px){ .split{grid-template-columns:1fr} .split .pane + .pane{border-left:0;border-top:1px solid var(--line)} }
+.big{font-size:34px;font-weight:800;letter-spacing:-.8px;font-variant-numeric:tabular-nums;margin-bottom:18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mid{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;margin-top:6px;background:var(--soft);color:var(--sub)}
+.pill.g{background:var(--green-l);color:#15803d}
+.pill.b{background:#dbeafe;color:#1d4ed8}
+
+/* filter pills */
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pills button{border:0;background:var(--soft);color:var(--sub);font:inherit;font-size:13px;font-weight:600;padding:7px 13px;border-radius:99px;cursor:pointer}
+.pills button.on{background:#111;color:#fff}
+.donut-wrap{display:flex;align-items:center;gap:26px;justify-content:center;min-height:170px}
+.donut{width:150px;height:150px;border-radius:50%;position:relative;flex:none;background:var(--soft)}
+.donut::after{content:"";position:absolute;inset:38px;border-radius:50%;background:#fff}
+.donut > span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;font-size:13px;font-weight:700;text-align:center;line-height:1.3}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:13px;min-width:0}
+.legend div{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.legend i{width:9px;height:9px;border-radius:50%;flex:none}
+.legend b{font-weight:600;margin-left:auto;padding-left:10px;font-variant-numeric:tabular-nums}
+
+/* form */
+.fgrid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px 18px}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:760px){ .fgrid{grid-template-columns:1fr 1fr} .fgrid .f-name{grid-column:1/-1} }
+label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:0 0 7px}
+label small{color:var(--mute);font-weight:500}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s,box-shadow .15s}
+input::placeholder{color:var(--mute)}
+input:focus,select:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.08)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23111' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 .amt-wrap{position:relative}
-.amt-wrap span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:15px}
-.amt-preview{font-size:13px;color:var(--accent);margin:6px 0 0 2px;min-height:16px;font-weight:500}
-.btn{border:0;border-radius:12px;padding:14px 18px;font:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s}
-.btn:active{opacity:.7;transform:scale(.98)}
+.amt-wrap span{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:14px}
+.amt-preview{font-size:12.5px;color:var(--green);margin-top:6px;font-weight:600}
+.amt-preview:empty{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink)}
+.chip:hover{background:var(--soft2)}
+.chip.on{background:#111;border-color:#111;color:#fff}
+.seg{display:flex;background:var(--soft);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:9px 0;font:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--sub);border-radius:8px}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.more{margin-top:18px;padding-top:18px;border-top:1px dashed var(--line)}
+.warn{font-size:12.5px;color:var(--orange);margin-top:6px}
+.btn{border:0;border-radius:10px;padding:13px 18px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn:active{opacity:.75}
 .btn:disabled{opacity:.4}
-.btn.primary{background:var(--accent);color:#fff;width:100%}
-.btn.ghost{background:var(--fill);color:var(--accent);font-weight:500}
-.btn.danger{background:rgba(255,59,48,.12);color:var(--warn);font-weight:500}
-.btn.sm{padding:9px 14px;font-size:15px;border-radius:10px}
+.btn.primary{background:#111;color:#fff;width:100%}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:600}
+.btn.danger{background:#fff;border:1px solid #fecaca;color:var(--red);font-weight:600}
+.btn.sm{padding:8px 13px;font-size:13px;white-space:nowrap}
 .row-btns{display:flex;gap:10px;margin-top:12px}
 .row-btns .btn{flex:1}
-.warn{font-size:13px;color:var(--orange);margin:6px 0 0 2px}
-/* summary tiles */
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}
-.kpi{background:var(--card);border-radius:var(--radius);padding:14px 16px}
-.kpi .k{font-size:13px;color:var(--sub)}
-.kpi .v{font-size:24px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
-.kpi.main{grid-column:1/-1;background:linear-gradient(135deg,#0a84ff,#5e5ce6);color:#fff;padding:20px}
-.kpi.main .k{color:rgba(255,255,255,.8)}
-.kpi.main .v{font-size:38px;color:#fff}
-@media (min-width:700px){ .kpis{grid-template-columns:repeat(4,1fr)} }
-/* list */
-.toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.toolbar input{flex:1;min-width:180px;padding-left:38px;background-color:var(--fill);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238e8e93' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5.5'/%3E%3Cpath d='M11 11l4 4' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:13px center}
-.toolbar select{width:auto;background-color:var(--fill)}
-table{width:100%;border-collapse:collapse;font-size:16px}
-th{text-align:left;font-size:12px;color:var(--sub);font-weight:500;padding:10px 8px;border-bottom:.5px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none;text-transform:uppercase}
-td{padding:12px 8px;border-bottom:.5px solid var(--line);vertical-align:middle}
-tr:last-child td{border-bottom:0}
+.edit-badge{font-size:12px;font-weight:700;background:var(--orange-l);color:var(--orange);padding:4px 10px;border-radius:99px}
+
+/* feed (side) */
+.side .card{padding:0;overflow:hidden}
+.side .card-h{padding:18px 18px 0;margin-bottom:8px}
+.feed{max-height:560px;overflow:auto}
+.f-item{display:flex;align-items:center;gap:12px;padding:12px 18px}
+.f-item + .f-item{border-top:1px solid var(--soft)}
+.av{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;background:var(--brand)}
+.av.groom{background:#1d4ed8}
+.f-main{flex:1;min-width:0}
+.f-main b{display:block;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-main small{color:var(--sub);font-size:13px}
+.f-amt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.f-amt small{display:block;color:var(--mute);font-size:12px;font-weight:500}
+.empty{text-align:center;color:var(--mute);padding:34px 16px;font-size:14px}
+
+/* list table */
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.toolbar input{flex:1;min-width:200px;padding-left:38px;border-radius:99px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23111' stroke-width='1.8'%3E%3Ccircle cx='7' cy='7' r='5.5'/%3E%3Cpath d='M11 11l4 4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 14px center}
+.toolbar select{width:auto;border-radius:99px}
+.tcard{padding:0;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-size:13px;color:var(--sub);font-weight:500;padding:14px 12px;background:var(--soft2);cursor:pointer;white-space:nowrap;user-select:none}
+td{padding:12px;border-top:1px solid var(--line);vertical-align:middle}
 tr.item{cursor:pointer}
-tr.item:active td{background:var(--fill2)}
+tr.item:hover td{background:var(--soft2)}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-td.num{font-weight:500}
-.tag{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;background:var(--fill);color:var(--sub);white-space:nowrap;font-weight:500}
-.tag.groom{background:rgba(88,86,214,.14);color:#5856d6}
+td.num{font-weight:600}
+.nm{display:flex;align-items:center;gap:11px}
+.nm .av{width:34px;height:34px;font-size:14px}
+.nm b{display:block;font-weight:700}
+.nm small{display:block;color:var(--sub);font-size:12.5px;margin-top:1px}
+.tag{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--sub);white-space:nowrap;font-weight:600}
+.tag.groom{background:#dbeafe;color:#1d4ed8}
+.tag.bride{background:var(--green-l);color:#15803d}
 .memo{font-size:13px;color:var(--sub)}
-.thx{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(128,128,128,.45);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:transparent;font-size:14px;padding:0;font-weight:700;transition:.15s}
-.thx.on{background:var(--ok);border-color:var(--ok);color:#fff}
-.empty{text-align:center;color:var(--sub);padding:36px 0;font-size:15px}
-.bar-row{display:grid;grid-template-columns:110px 1fr 120px;gap:12px;align-items:center;padding:8px 0;font-size:15px}
-.bar-row + .bar-row{border-top:.5px solid var(--line)}
-.bar{height:8px;background:var(--fill);border-radius:99px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
-.bar-row .r{text-align:right;font-variant-numeric:tabular-nums;color:var(--sub);font-size:13px}
-.bar-row .r b{color:var(--ink);font-weight:600;font-size:15px}
-.cash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.diff{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:15px;display:flex;justify-content:space-between;background:var(--fill2)}
-.diff.ok{background:rgba(52,199,89,.14);color:var(--okt)}
-.diff.bad{background:rgba(255,59,48,.12);color:var(--warn)}
-.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-20px);background:var(--bar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--ink);padding:12px 20px;border-radius:99px;font-size:15px;font-weight:500;opacity:0;transition:.3s cubic-bezier(.2,.8,.2,1);pointer-events:none;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
-.modal-bg.show{display:flex}
-.modal{background:var(--bar);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-radius:14px;padding:20px 16px 0;max-width:290px;width:100%;text-align:center;overflow:hidden}
-.modal p{margin:0 0 18px;line-height:1.4;font-size:15px}
-.modal .row-btns{margin:0 -16px;gap:0;border-top:.5px solid var(--line)}
-.modal .row-btns .btn{border-radius:0;background:transparent;padding:12px;font-size:17px}
-.modal .row-btns .btn.ghost{color:var(--accent);border-right:.5px solid var(--line)}
-.modal .row-btns .btn.danger{color:var(--warn);font-weight:600}
-.hidden{display:none!important}
-.recent{font-size:15px;color:var(--ink);margin-top:16px}
-.recent div{display:flex;justify-content:space-between;padding:11px 0;border-top:.5px solid var(--line)}
-.recent div:first-child{border:0;color:var(--sub);font-size:13px;text-transform:uppercase;padding-top:0}
-.recent div span:last-child{font-weight:600;font-variant-numeric:tabular-nums}
-.backup{padding:12px 16px;font-size:14px;margin-bottom:14px}
+.thx{width:26px;height:26px;border-radius:50%;border:1.5px solid #d1d5db;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:transparent;font-size:13px;padding:0;font-weight:800}
+.thx.on{background:var(--green);border-color:var(--green);color:#fff}
+.note{text-align:center;font-size:13px;color:var(--mute);margin-top:12px}
+
+/* summary tab */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:20px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.kpi{padding:18px 20px;background:#fff}
+.kpi + .kpi{border-left:1px solid var(--line)}
+.kpi .k{margin-bottom:6px}
+.kpi .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.kpi.main{grid-column:1/-1;border-bottom:1px solid var(--line);border-left:0}
+.kpi.main .v{font-size:34px}
+.kpi.main + .kpi{border-left:0}
+@media (max-width:760px){ .kpis{grid-template-columns:1fr 1fr} .kpi:nth-child(4){border-left:0;border-top:1px solid var(--line)} .kpi:nth-child(5){border-top:1px solid var(--line)} }
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.sum-grid .card{margin:0}
+@media (max-width:860px){ .sum-grid{grid-template-columns:1fr} }
+.bar-row{display:grid;grid-template-columns:104px 1fr 116px;gap:12px;align-items:center;padding:9px 0;font-size:14px}
+.bar-row + .bar-row{border-top:1px solid var(--soft)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+.bar-row .r{text-align:right;font-variant-numeric:tabular-nums;color:var(--sub);font-size:12.5px}
+.bar-row .r b{color:var(--ink);font-weight:700;font-size:14px}
+.cash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cash-grid .full{grid-column:1/-1}
+@media (max-width:760px){ .cash-grid{grid-template-columns:1fr 1fr} }
+.diff{margin-top:14px;padding:14px 16px;border-radius:10px;font-size:14px;display:flex;justify-content:space-between;background:var(--soft2);border:1px solid var(--line)}
+.diff.ok{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.diff.bad{background:#fef2f2;border-color:#fecaca;color:var(--red)}
+.backup{padding:14px 18px;font-size:13.5px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .backup .b-line{color:var(--sub)}
-.backup.ok .b-line{color:var(--okt)}
-.backup.need{background:rgba(255,149,0,.12)}
-.backup.need .b-line{color:#c26b00}
-@media (prefers-color-scheme:dark){ .backup.need .b-line{color:#ffb340} }
-.backup .row-btns{margin-top:10px}
-.edit-badge{font-size:13px;font-weight:600;background:rgba(255,149,0,.15);color:#c26b00;padding:4px 10px;border-radius:99px}
-@media (min-width:900px){
-  #tab-input .card{display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:start;padding:22px}
-  #tab-input .card h2{grid-column:1/-1;margin-bottom:0}
-  #tab-input .recent{margin-top:0;background:var(--fill2);border-radius:12px;padding:14px 16px}
-}
-@media (max-width:520px){
-  .hide-m{display:none}
-  .bar-row{grid-template-columns:84px 1fr 100px}
-  header h1{font-size:30px}
-}
-
-/* ---- clean grouped form ---- */
-.in-layout{display:grid;gap:8px}
-
-.sec-head{font-size:22px;font-weight:700;margin:22px 4px 10px;display:flex;align-items:center;gap:10px}
-.sec-head.sub{font-size:13px;font-weight:400;color:var(--sub);text-transform:none;margin:22px 16px 8px}
-.sec-head.sub span{opacity:.7}
-.group{background:var(--card);border-radius:12px;overflow:hidden}
-.group.pad{padding:18px 18px 16px}
-.row{display:flex;align-items:center;gap:12px;min-height:54px;padding:0 16px;position:relative}
-.row::after{content:"";position:absolute;left:16px;right:0;bottom:0;border-bottom:.5px solid var(--line)}
-.group > .row:last-child::after,.group > :last-child.row::after{display:none}
-.row .lab{width:84px;flex:none;font-size:17px;color:var(--ink);font-weight:500}
-.row input{flex:1;background:transparent!important;padding:15px 0;border-radius:0;box-shadow:none!important;font-size:17px;min-width:0}
-.row input:focus{background:transparent}
-.row:focus-within .lab{color:var(--accent)}
-.row .suffix{color:var(--sub);font-size:17px}
-.row .seg{flex:1;max-width:260px;margin-left:auto}
-.chips.scroll{flex-wrap:wrap;padding:2px 16px 14px;margin-top:-6px;gap:8px}
-.chips.scroll::-webkit-scrollbar{display:none}
-.chips.scroll .chip{flex:none;background:var(--fill2);font-size:15px;padding:7px 14px}
-.chips.scroll .chip.on{background:var(--accent);color:#fff}
-.group > .chips.scroll{border-bottom:.5px solid var(--line);margin-left:0}
-.group .warn{padding:0 16px 10px}
-.row:has(+ .chips)::after,.row:has(+ .warn:not(.hidden))::after{display:none}
-
-.btn.big{margin-top:22px;padding:16px;font-size:18px;border-radius:14px}
-.sumcard{background:var(--card);border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.sum-k{font-size:14px;color:var(--sub);margin-bottom:2px}
-.now-total{font-size:34px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.15}
-.now-count{color:var(--sub);font-size:15px;padding-bottom:4px}
-#recent .r-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;position:relative;font-size:16px}
-#recent .r-item + .r-item::before{content:"";position:absolute;left:16px;right:0;top:0;border-top:.5px solid var(--line)}
-#recent .r-item small{display:block;color:var(--sub);font-size:13px;margin-top:2px}
-#recent .r-item b{font-weight:600;font-variant-numeric:tabular-nums}
-#recent .r-no{color:var(--sub);font-size:14px;width:28px;flex:none}
+.backup.ok .b-line{color:#15803d}
+.backup.need{background:#fffbeb;border-color:#fde68a}
+.backup.need .b-line{color:#92400e}
+.backup .row-btns{margin:0}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(16px);background:#111;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(17,24,39,.4);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:22px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal p{margin:0 0 18px;line-height:1.5}
+@media (max-width:760px){ .hide-m{display:none} .wrap{padding-left:16px;padding-right:16px} header h1{font-size:28px} .big{font-size:30px} }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="tabs">
+    <button data-tab="input" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 8.5l9 5.5 9-5.5"/></svg>입력</button>
+    <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg>명단</button>
+    <button data-tab="sum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>합계·정산</button>
+  </div>
   <header>
-    <h1 id="title">축의금 장부</h1>
+    <h1 id="title">축의금 장부</h1><span class="badge" id="countBadge">0건</span>
     <div class="sub" id="subtitle">봉투 받는 대로 바로 입력하세요</div>
   </header>
   <div class="status" id="status">불러오는 중…</div>
-  <div class="backup card need" id="installBox" style="display:none">
+  <div class="card backup need" id="installBox" style="display:none">
     <div class="b-line">⚠ 아직 앱으로 설치되지 않았어요. 사파리 <b>공유 버튼(□↑) → '홈 화면에 추가'</b>를 누른 뒤, 홈 화면의 <b>축의금 장부</b> 아이콘으로 열어서 쓰세요. (사파리에서 입력한 내용은 앱으로 옮겨지지 않아요)</div>
-  </div>
-
-  <div class="tabs">
-    <button data-tab="input" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 8.5l9 5.5 9-5.5"/></svg><span>입력</span></button>
-    <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg><span>명단</span></button>
-    <button data-tab="sum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></svg><span>합계·정산</span></button>
   </div>
 
   <!-- 입력 -->
   <section id="tab-input">
-    <div class="in-layout">
-      <div class="sumcard">
-        <div><div class="sum-k">지금까지 받은 축의금</div><div class="now-total" id="nowTotal">0원</div></div>
-        <div class="now-count" id="nowCount">아직 입력된 봉투가 없어요</div>
-      </div>
-      <form id="form" autocomplete="off" class="in-form">
-        <div class="sec-head"><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></div>
-        <div class="group">
-          <div class="row"><span class="lab">이름</span><input id="f-name" placeholder="홍길동" required></div>
-          <div class="warn hidden" id="dupWarn"></div>
-          <div class="row"><span class="lab">금액</span><input id="f-amt" inputmode="decimal" placeholder="0"><span class="suffix">만원</span></div>
-          <div class="chips scroll" id="amtChips"></div>
-          <div class="row"><span class="lab">관계</span><input id="f-rel" placeholder="선택 또는 입력"></div>
-          <div class="chips scroll" id="relChips"></div>
-          <div class="row"><span class="lab">구분</span>
-            <div class="seg" id="f-side"><button type="button" data-v="신부측" class="on">신부측</button><button type="button" data-v="신랑측">신랑측</button></div>
+    <div class="dash">
+      <div class="main">
+        <div class="card split">
+          <div class="pane">
+            <div class="card-h">축의금 현황</div>
+            <div class="k">총 축의금</div>
+            <div class="big" id="nowTotal">₩0</div>
+            <div class="stats">
+              <div><div class="k">신부측</div><div class="mid" id="sBride">₩0</div><span class="pill g" id="sBrideN">0건</span></div>
+              <div><div class="k">신랑측</div><div class="mid" id="sGroom">₩0</div><span class="pill b" id="sGroomN">0건</span></div>
+              <div><div class="k">평균</div><div class="mid" id="sAvg">-</div><span class="pill" id="nowCount">0건</span></div>
+            </div>
+          </div>
+          <div class="pane">
+            <div class="card-h">비중
+              <div class="pills" id="donutMode"><button type="button" class="on" data-m="rel">관계별</button><button type="button" data-m="side">구분별</button><button type="button" data-m="amt">금액대별</button></div>
+            </div>
+            <div class="donut-wrap"><div class="donut" id="donut"><span id="donutCenter">-</span></div><div class="legend" id="legend"></div></div>
           </div>
         </div>
-        <div class="sec-head sub">추가 정보 <span>(선택)</span></div>
-        <div class="group">
-          <div class="row"><span class="lab">봉투 번호</span><input id="f-no" inputmode="numeric" placeholder="자동"></div>
-          <div class="row"><span class="lab">식권</span><input id="f-ticket" inputmode="numeric" placeholder="0"><span class="suffix">장</span></div>
-          <div class="row"><span class="lab">답례품</span>
-            <div class="seg" id="f-gift"><button type="button" data-v="0" class="on">안 줌</button><button type="button" data-v="1">줌</button></div>
+
+        <div class="sec-title" style="display:flex;align-items:center;gap:10px"><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></div>
+        <form id="form" autocomplete="off" class="card">
+          <div class="fgrid">
+            <div class="f-name">
+              <label>이름</label>
+              <input id="f-name" placeholder="홍길동 (부부는 홍길동·김영희)" required>
+              <div class="warn hidden" id="dupWarn"></div>
+            </div>
+            <div>
+              <label>금액 <small>만원 단위</small></label>
+              <div class="amt-wrap"><input id="f-amt" inputmode="decimal" placeholder="5"><span>만원</span></div>
+            </div>
+            <div>
+              <label>구분</label>
+              <div class="seg" id="f-side"><button type="button" data-v="신부측" class="on">신부측</button><button type="button" data-v="신랑측">신랑측</button></div>
+            </div>
+            <div class="full" style="margin-top:-10px">
+              <div class="chips" id="amtChips" style="margin-top:0"></div>
+              <div class="amt-preview" id="amtPreview"></div>
+            </div>
+            <div class="full">
+              <label>관계</label>
+              <input id="f-rel" placeholder="아래에서 고르거나 직접 입력">
+              <div class="chips" id="relChips"></div>
+            </div>
           </div>
-          <div class="row"><span class="lab">메모</span><input id="f-memo" placeholder="화환, 계좌이체, 대리 전달 등"></div>
-        </div>
-        <div class="amt-preview hidden" id="amtPreview"></div>
-        <button class="btn primary big" type="submit" id="saveBtn">저장</button>
-        <div class="row-btns hidden" id="editBtns">
-          <button class="btn ghost" type="button" id="cancelEdit">취소</button>
-          <button class="btn danger" type="button" id="delBtn">삭제</button>
-        </div>
-      </form>
-      <div id="recentWrap" class="hidden">
-        <div class="sec-head sub">방금 입력</div>
-        <div class="group" id="recent"></div>
+          <div class="fgrid more">
+            <div><label>봉투 번호 <small>자동</small></label><input id="f-no" inputmode="numeric" placeholder="자동"></div>
+            <div><label>식권 <small>장</small></label><input id="f-ticket" inputmode="numeric" placeholder="0"></div>
+            <div><label>답례품</label><div class="seg" id="f-gift"><button type="button" data-v="0" class="on">안 줌</button><button type="button" data-v="1">줌</button></div></div>
+            <div class="full"><label>메모 <small>선택</small></label><input id="f-memo" placeholder="화환, 계좌이체, 대리 전달 등"></div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn primary" type="submit" id="saveBtn">저장</button>
+            <div class="row-btns hidden" id="editBtns">
+              <button class="btn ghost" type="button" id="cancelEdit">취소</button>
+              <button class="btn danger" type="button" id="delBtn">삭제</button>
+            </div>
+          </div>
+        </form>
       </div>
+      <aside class="side">
+        <div class="card">
+          <div class="card-h">방금 입력 <span class="pill" id="recentN" style="margin:0">0</span></div>
+          <div class="feed" id="recent"><div class="empty">입력한 봉투가 여기 쌓여요</div></div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -260,10 +289,10 @@ td.num{font-weight:500}
       <span style="flex:1"></span>
       <span class="memo" id="listCount" style="align-self:center"></span>
     </div>
-    <div class="card" style="padding:6px 10px">
+    <div class="card tcard">
       <table>
         <thead><tr>
-          <th data-sort="no" class="num">번호</th>
+          <th data-sort="no" class="num" style="width:64px">번호</th>
           <th data-sort="name">이름</th>
           <th data-sort="rel" class="hide-m">관계</th>
           <th data-sort="amount" class="num">금액</th>
@@ -273,7 +302,7 @@ td.num{font-weight:500}
         <tbody id="tbody"></tbody>
       </table>
     </div>
-    <div class="memo" style="text-align:center">행을 누르면 수정할 수 있어요 · '감사' 칸은 감사 인사(연락) 완료 체크</div>
+    <div class="note">행을 누르면 수정할 수 있어요 · '감사' 칸은 감사 인사(연락) 완료 체크</div>
   </section>
 
   <!-- 합계 -->
@@ -294,6 +323,7 @@ td.num{font-weight:500}
       <div class="kpi"><div class="k">식권 지급</div><div class="v" id="kTicket">0장</div></div>
       <div class="kpi"><div class="k">감사 인사 완료</div><div class="v" id="kThx">0 / 0</div></div>
     </div>
+    <div class="sum-grid">
     <div class="card" id="sideCard">
       <h2>구분별</h2>
       <div id="sideBars"></div>
@@ -306,6 +336,8 @@ td.num{font-weight:500}
       <h2>금액대별</h2>
       <div id="amtBars"></div>
     </div>
+    </div>
+    <div style="height:20px"></div>
     <div class="card">
       <h2>현금 대조 <span class="memo">실제 세어본 지폐 장수</span></h2>
       <div class="cash-grid">
@@ -313,7 +345,7 @@ td.num{font-weight:500}
         <div><label>1만원권</label><input data-cash="10000" inputmode="numeric" placeholder="0"></div>
         <div><label>5천원권</label><input data-cash="5000" inputmode="numeric" placeholder="0"></div>
         <div><label>1천원권</label><input data-cash="1000" inputmode="numeric" placeholder="0"></div>
-        <div class="full" style="grid-column:1/-1"><label>현금 외 (계좌이체·수표 등, 원)</label><input data-cash="etc" inputmode="numeric" placeholder="0"></div>
+        <div class="full"><label>현금 외 (계좌이체·수표 등, 원)</label><input data-cash="etc" inputmode="numeric" placeholder="0"></div>
       </div>
       <div class="diff" id="cashDiff"></div>
     </div>
@@ -523,10 +555,8 @@ function renderList(){
   $("#tbody").innerHTML = rows.length ? rows.map(g=>`
     <tr class="item" data-id="${esc(g.id)}">
       <td class="num">${g.no}</td>
-      <td><div>${esc(g.name)} ${g.side==="신랑측"?'<span class="tag groom">신랑측</span>':""}</div>
-        ${g.memo||g.gift?`<div class="memo">${g.gift?"답례품 · ":""}${esc(g.memo)}</div>`:""}
-        <div class="memo" style="display:none" data-m>${esc(g.rel)}</div></td>
-      <td class="hide-m">${g.rel?`<span class="tag">${esc(g.rel)}</span>`:""}</td>
+      <td><div class="nm"><div class="av ${g.side==="신랑측"?"groom":""}">${esc((g.name||"?").trim()[0]||"?")}</div><div><b>${esc(g.name)}</b><small>${[g.side, g.gift?"답례품":"", g.memo].filter(Boolean).map(esc).join(" · ")}</small><small style="display:none" data-m>${esc(g.rel)}</small></div></div></td>
+      <td class="hide-m">${g.rel?`<span class="tag ${g.side==="신랑측"?"groom":"bride"}">${esc(g.rel)}</span>`:""}</td>
       <td class="num">${manwon(g.amount)}</td>
       <td class="num hide-m">${g.ticket||""}</td>
       <td><button class="thx ${g.thanked?"on":""}" data-thx="${esc(g.id)}" aria-label="감사 인사 완료">✓</button></td>
@@ -577,8 +607,8 @@ $("#xlsxBtn").onclick = async ()=>{
 function stats(){
   const total=gifts.reduce((s,g)=>s+g.amount,0), count=gifts.length;
   const group=f=>{ const m={}; gifts.forEach(g=>{ const k=f(g); (m[k]=m[k]||{k,n:0,sum:0}); m[k].n++; m[k].sum+=g.amount; }); return Object.values(m).sort((a,b)=>b.sum-a.sum); };
-  const bucket=a=>a<50000?"5만원 미만":a<100000?"5만원~10만원 미만":a<200000?"10만원~20만원 미만":a<500000?"20만원~50만원 미만":"50만원 이상";
-  const order=["5만원 미만","5만원~10만원 미만","10만원~20만원 미만","20만원~50만원 미만","50만원 이상"];
+  const bucket=a=>a<50000?"5만 미만":a<100000?"5~10만":a<200000?"10~20만":a<500000?"20~50만":"50만 이상";
+  const order=["5만 미만","5~10만","10~20만","20~50만","50만 이상"];
   return { total, count, avg:count?total/count:0, tickets:gifts.reduce((s,g)=>s+(g.ticket||0),0),
     thanked:gifts.filter(g=>g.thanked).length,
     byRel:group(g=>g.rel||"미기재"), bySide:group(g=>g.side||"신부측"),
@@ -590,7 +620,7 @@ function bars(el, list, by){
 }
 function renderSum(){
   const s=stats();
-  $("#kTotal").textContent=won(s.total); $("#kCount").textContent=s.count+"건"; $("#kAvg").textContent=manwon(Math.round(s.avg/1000)*1000);
+  $("#kTotal").textContent=wonS(s.total); $("#kCount").textContent=s.count+"건"; $("#kAvg").textContent=manwon(Math.round(s.avg/1000)*1000);
   $("#kTicket").textContent=s.tickets+"장"; $("#kThx").textContent=`${s.thanked} / ${s.count}`;
   bars("#sideBars",s.bySide,"sum"); $("#sideCard").classList.toggle("hidden", s.bySide.length<2);
   bars("#relBars",s.byRel,"sum"); bars("#amtBars",s.byAmt,"n");
@@ -632,13 +662,33 @@ $("#saveSettings").onclick = async ()=>{
   persist(); toast("설정을 저장했어요");
 };
 
+const PAL=["#063f35","#15803d","#34a36b","#7cc9a0","#b9e4cc","#1d4ed8","#93c5fd","#d1d5db"];
+const wonS=n=>"₩"+(Math.round(n)||0).toLocaleString("ko-KR");
+let donutMode="rel";
+$("#donutMode").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; donutMode=b.dataset.m; $$("#donutMode button").forEach(x=>x.classList.toggle("on",x===b)); renderDonut(); };
+function renderDonut(){
+  const st=stats(); let list = donutMode==="rel"?st.byRel : donutMode==="side"?st.bySide : st.byAmt;
+  if(list.length>7){ const rest=list.slice(6); list=list.slice(0,6).concat([{k:"그 외",n:rest.reduce((s,r)=>s+r.n,0),sum:rest.reduce((s,r)=>s+r.sum,0)}]); }
+  const tot=list.reduce((s,r)=>s+r.sum,0);
+  if(!tot){ $("#donut").style.background=""; $("#donutCenter").textContent="데이터 없음"; $("#legend").innerHTML=""; return; }
+  let acc=0; const segs=list.map((r,i)=>{ const from=acc/tot*360; acc+=r.sum; const col=donutMode==="side"&&r.k==="신랑측"?"#1d4ed8":PAL[i%PAL.length]; r.c=col; return `${col} ${from}deg ${acc/tot*360}deg`; });
+  $("#donut").style.background=`conic-gradient(${segs.join(",")})`;
+  $("#donutCenter").innerHTML=`<div style="font-size:12px;color:#6b7280;font-weight:500">봉투</div><div style="font-size:20px;font-weight:800">${st.count}건</div>`;
+  $("#legend").innerHTML=list.map(r=>`<div><i style="background:${r.c}"></i>${esc(r.k)}<b>${Math.round(r.sum/tot*100)}%</b></div>`).join("");
+}
 function renderRecent(){
   const st=stats();
-  $("#nowTotal").textContent=won(st.total);
-  $("#nowCount").textContent= st.count ? `봉투 ${st.count}건 · 평균 ${manwon(Math.round(st.avg/1000)*1000)}` : "아직 입력된 봉투가 없어요";
-  const r=[...gifts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,6);
-  $("#recentWrap").classList.toggle("hidden", !r.length);
-  $("#recent").innerHTML = r.map(g=>`<div class="r-item"><span class="r-no">${g.no}</span><span style="flex:1">${esc(g.name)}${g.rel?`<small>${esc(g.rel)}${g.side==="신랑측"?" · 신랑측":""}</small>`:""}</span><b>${manwon(g.amount)}</b></div>`).join("");
+  $("#nowTotal").textContent=wonS(st.total);
+  $("#countBadge").textContent=st.count+"건";
+  const bride=st.bySide.find(r=>r.k==="신부측")||{sum:0,n:0}, groom=st.bySide.find(r=>r.k==="신랑측")||{sum:0,n:0};
+  $("#sBride").textContent=wonS(bride.sum); $("#sBrideN").textContent=bride.n+"건";
+  $("#sGroom").textContent=wonS(groom.sum); $("#sGroomN").textContent=groom.n+"건";
+  $("#sAvg").textContent= st.count? manwon(Math.round(st.avg/1000)*1000) : "-";
+  $("#nowCount").textContent="봉투 "+st.count+"건";
+  renderDonut();
+  const r=[...gifts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,30);
+  $("#recentN").textContent=gifts.length;
+  $("#recent").innerHTML = r.length ? r.map(g=>`<div class="f-item"><div class="av ${g.side==="신랑측"?"groom":""}">${esc((g.name||"?").trim()[0]||"?")}</div><div class="f-main"><b>${esc(g.name)}</b><small>${esc(g.rel||"관계 미기재")}</small></div><div class="f-amt">${manwon(g.amount)}<small>${g.no}번</small></div></div>`).join("") : `<div class="empty">입력한 봉투가 여기 쌓여요</div>`;
 }
 function renderAll(){
   renderRelFilter(); renderList(); renderSum(); renderRecent();
