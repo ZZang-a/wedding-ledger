@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>축의금 장부</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="축의금 장부">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#faf7f2">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<script src="xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#faf7f2; --card:#fff; --ink:#2b2420; --sub:#7a6f66; --line:#ece4da;
+  --accent:#b5835a; --accent-d:#8f6340; --accent-l:#f5ebe0;
+  --ok:#3f7d5a; --warn:#b4452f; --radius:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:820px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(80px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+input,select{font-size:16px}
+.chip{padding:9px 14px;font-size:14px}
+.thx{width:30px;height:30px}
+.install{display:none}
+@media (min-width:900px){
+  #tab-input .card{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start}
+  #tab-input .card h2{grid-column:1/-1;margin-bottom:0}
+  #tab-input .recent{margin-top:0}
+}
+header{text-align:center;padding:10px 0 14px}
+header h1{font-family:"Batang","바탕","AppleMyungjo",serif;font-weight:600;font-size:24px;margin:0;letter-spacing:-.5px}
+header .sub{color:var(--sub);font-size:13px;margin-top:4px}
+.status{font-size:12px;text-align:center;margin:-4px 0 10px;color:var(--sub)}
+.status.bad{color:var(--warn)}
+.tabs{display:flex;gap:6px;background:var(--accent-l);padding:4px;border-radius:12px;margin-bottom:14px;position:sticky;top:6px;z-index:5}
+.tabs button{flex:1;border:0;background:transparent;padding:10px 0;border-radius:9px;font:inherit;font-weight:500;color:var(--sub);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px;font-weight:500}
+input,select,textarea{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:11px 0;font:inherit;cursor:pointer;color:var(--sub)}
+.seg button.on{background:var(--accent-l);color:var(--accent-d);font-weight:700}
+.amt-wrap{position:relative}
+.amt-wrap span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:13px}
+.amt-preview{font-size:12px;color:var(--accent-d);margin-top:4px;min-height:16px}
+.btn{border:0;border-radius:11px;padding:13px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--accent);color:#fff;width:100%}
+.btn.primary:active{background:var(--accent-d)}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:500}
+.btn.danger{background:#fff;border:1px solid #e9c4bb;color:var(--warn);font-weight:500}
+.btn.sm{padding:8px 12px;font-size:13px}
+.row-btns{display:flex;gap:8px;margin-top:10px}
+.row-btns .btn{flex:1}
+.warn{font-size:12px;color:var(--warn);margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.kpi .k{font-size:12px;color:var(--sub)}
+.kpi .v{font-size:22px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi.main{grid-column:1/-1;background:var(--accent-l);border-color:#ead9c6}
+.kpi.main .v{font-size:30px;color:var(--accent-d)}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.toolbar input{flex:1;min-width:150px}
+.toolbar select{width:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--sub);font-weight:500;padding:8px 6px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.item{cursor:pointer}
+tr.item:hover td{background:#fcf8f3}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;background:var(--accent-l);color:var(--accent-d);white-space:nowrap}
+.tag.groom{background:#e8eef5;color:#3f5f86}
+.memo{font-size:12px;color:var(--sub)}
+.thx{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;padding:0}
+.thx.on{background:var(--ok);border-color:var(--ok)}
+.empty{text-align:center;color:var(--sub);padding:30px 0;font-size:14px}
+.bar-row{display:grid;grid-template-columns:96px 1fr 110px;gap:8px;align-items:center;margin-bottom:8px;font-size:13px}
+.bar{height:10px;background:var(--accent-l);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.bar-row .r{text-align:right;font-variant-numeric:tabular-nums;color:var(--sub)}
+.bar-row .r b{color:var(--ink);font-weight:500}
+.cash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.diff{margin-top:12px;padding:12px;border-radius:10px;font-size:14px;display:flex;justify-content:space-between}
+.diff.ok{background:#e9f3ec;color:var(--ok)}
+.diff.bad{background:#f8e7e3;color:var(--warn)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#2b2420;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(30,20,10,.35);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:20px;max-width:340px;width:100%}
+.modal p{margin:0 0 16px;line-height:1.5}
+.hidden{display:none!important}
+.recent{font-size:13px;color:var(--sub);margin-top:12px}
+.recent div{display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed var(--line)}
+.backup{padding:12px 14px;font-size:13px}
+.backup .b-line{color:var(--sub)}
+.backup.ok .b-line{color:var(--ok)}
+.backup.need{border-color:#e9c4bb;background:#fdf5f3}
+.backup.need .b-line{color:var(--warn)}
+.edit-badge{font-size:12px;background:#fff3d6;color:#8a6412;padding:3px 8px;border-radius:6px}
+@media (max-width:520px){
+  .hide-m{display:none}
+  .bar-row{grid-template-columns:80px 1fr 96px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">축의금 장부</h1>
+    <div class="sub" id="subtitle">봉투 받는 대로 바로 입력하세요</div>
+  </header>
+  <div class="status" id="status">불러오는 중…</div>
+  <div class="backup card need" id="installBox" style="display:none">
+    <div class="b-line">⚠ 아직 앱으로 설치되지 않았어요. 사파리 <b>공유 버튼(□↑) → '홈 화면에 추가'</b>를 누른 뒤, 홈 화면의 <b>축의금 장부</b> 아이콘으로 열어서 쓰세요. (사파리에서 입력한 내용은 앱으로 옮겨지지 않아요)</div>
+  </div>
+  <div class="backup card" id="backupBox">
+    <div class="b-line"><span id="backupState"></span></div>
+    <div class="row-btns" style="margin-top:8px">
+      <button class="btn ghost sm" id="linkBtn">백업 보내기</button>
+      <button class="btn ghost sm" id="loadBtn">백업에서 불러오기</button>
+    </div>
+    <input type="file" id="loadFile" accept=".json,application/json" class="hidden">
+  </div>
+
+  <div class="tabs">
+    <button data-tab="input" class="on">입력</button>
+    <button data-tab="list">명단</button>
+    <button data-tab="sum">합계·정산</button>
+  </div>
+
+  <!-- 입력 -->
+  <section id="tab-input">
+    <div class="card">
+      <h2><span id="formTitle">봉투 입력</span><span id="editBadge" class="edit-badge hidden">수정 중</span></h2>
+      <form id="form" autocomplete="off">
+        <div class="grid">
+          <div>
+            <label>봉투 번호</label>
+            <input id="f-no" inputmode="numeric" placeholder="자동">
+          </div>
+          <div>
+            <label>구분</label>
+            <div class="seg" id="f-side">
+              <button type="button" data-v="신부측" class="on">신부측</button>
+              <button type="button" data-v="신랑측">신랑측</button>
+            </div>
+          </div>
+          <div class="full">
+            <label>이름</label>
+            <input id="f-name" placeholder="예: 홍길동 (부부면 '홍길동·김영희')" required>
+            <div class="warn hidden" id="dupWarn"></div>
+          </div>
+          <div class="full">
+            <label>금액 (만원 단위로 입력)</label>
+            <div class="amt-wrap"><input id="f-amt" inputmode="decimal" placeholder="예: 5"><span>만원</span></div>
+            <div class="amt-preview" id="amtPreview"></div>
+            <div class="chips" id="amtChips"></div>
+          </div>
+          <div class="full">
+            <label>관계</label>
+            <input id="f-rel" placeholder="직접 입력하거나 아래에서 선택">
+            <div class="chips" id="relChips"></div>
+          </div>
+          <div>
+            <label>식권 (장)</label>
+            <input id="f-ticket" inputmode="numeric" placeholder="0">
+          </div>
+          <div>
+            <label>답례품</label>
+            <div class="seg" id="f-gift">
+              <button type="button" data-v="0" class="on">안 줌</button>
+              <button type="button" data-v="1">줌</button>
+            </div>
+          </div>
+          <div class="full">
+            <label>메모</label>
+            <input id="f-memo" placeholder="예: 화환도 보냄, 계좌이체, 대리 전달(○○ 통해)">
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn primary" type="submit" id="saveBtn">저장</button>
+          <div class="row-btns hidden" id="editBtns">
+            <button class="btn ghost" type="button" id="cancelEdit">취소</button>
+            <button class="btn danger" type="button" id="delBtn">삭제</button>
+          </div>
+        </div>
+      </form>
+      <div class="recent" id="recent"></div>
+    </div>
+  </section>
+
+  <!-- 명단 -->
+  <section id="tab-list" class="hidden">
+    <div class="toolbar">
+      <input id="q" placeholder="이름·관계·메모 검색">
+      <select id="fSide"><option value="">전체</option><option>신부측</option><option>신랑측</option></select>
+      <select id="fRel"><option value="">모든 관계</option></select>
+    </div>
+    <div class="toolbar">
+      <button class="btn ghost sm" id="xlsxBtn">엑셀 저장</button>
+      <button class="btn ghost sm" id="copyBtn">표 복사 (엑셀 붙여넣기용)</button>
+      <span style="flex:1"></span>
+      <span class="memo" id="listCount" style="align-self:center"></span>
+    </div>
+    <div class="card" style="padding:6px 10px">
+      <table>
+        <thead><tr>
+          <th data-sort="no" class="num">번호</th>
+          <th data-sort="name">이름</th>
+          <th data-sort="rel" class="hide-m">관계</th>
+          <th data-sort="amount" class="num">금액</th>
+          <th data-sort="ticket" class="num hide-m">식권</th>
+          <th title="감사 인사 완료">감사</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="memo" style="text-align:center">행을 누르면 수정할 수 있어요 · '감사' 칸은 감사 인사(연락) 완료 체크</div>
+  </section>
+
+  <!-- 합계 -->
+  <section id="tab-sum" class="hidden">
+    <div class="kpis">
+      <div class="kpi main"><div class="k">총 축의금</div><div class="v" id="kTotal">0원</div></div>
+      <div class="kpi"><div class="k">봉투 수</div><div class="v" id="kCount">0</div></div>
+      <div class="kpi"><div class="k">평균</div><div class="v" id="kAvg">0원</div></div>
+      <div class="kpi"><div class="k">식권 지급</div><div class="v" id="kTicket">0장</div></div>
+      <div class="kpi"><div class="k">감사 인사 완료</div><div class="v" id="kThx">0 / 0</div></div>
+    </div>
+    <div class="card" id="sideCard">
+      <h2>구분별</h2>
+      <div id="sideBars"></div>
+    </div>
+    <div class="card">
+      <h2>관계별</h2>
+      <div id="relBars"></div>
+    </div>
+    <div class="card">
+      <h2>금액대별</h2>
+      <div id="amtBars"></div>
+    </div>
+    <div class="card">
+      <h2>현금 대조 <span class="memo">실제 세어본 지폐 장수</span></h2>
+      <div class="cash-grid">
+        <div><label>5만원권</label><input data-cash="50000" inputmode="numeric" placeholder="0"></div>
+        <div><label>1만원권</label><input data-cash="10000" inputmode="numeric" placeholder="0"></div>
+        <div><label>5천원권</label><input data-cash="5000" inputmode="numeric" placeholder="0"></div>
+        <div><label>1천원권</label><input data-cash="1000" inputmode="numeric" placeholder="0"></div>
+        <div class="full" style="grid-column:1/-1"><label>현금 외 (계좌이체·수표 등, 원)</label><input data-cash="etc" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="diff" id="cashDiff"></div>
+    </div>
+    <div class="card">
+      <h2>설정</h2>
+      <label>장부 제목</label>
+      <input id="s-title" placeholder="예: ○○ ♥ △△ 결혼식 축의금">
+      <div style="height:10px"></div>
+      <label>부제 (날짜·장소 등)</label>
+      <input id="s-sub" placeholder="예: 2026.11.21 토 12:30 · ○○웨딩홀">
+      <div style="height:10px"></div>
+      <label>관계 빠른 선택 목록 (쉼표로 구분)</label>
+      <input id="s-rels">
+      <div class="row-btns"><button class="btn ghost" id="saveSettings">설정 저장</button></div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-bg" id="modal"><div class="modal"><p id="modalMsg"></p><div class="row-btns"><button class="btn ghost" id="mNo">취소</button><button class="btn danger" id="mYes">확인</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const DEFAULT_RELS = ["신부 친구","신부 직장","신부 학교","부모님 지인","친척","신랑 친구","신랑 직장","기타"];
+const AMTS = [3,5,7,10,15,20,30,50];
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const won = n => (Math.round(n)||0).toLocaleString("ko-KR") + "원";
+const manwon = n => {
+  if(!n) return "0원";
+  const m = n/10000;
+  return (Number.isInteger(m) ? m : m.toFixed(1)) + "만원";
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toInt = v => { const n = parseInt(String(v).replace(/[^\d]/g,""),10); return isNaN(n)?0:n; };
+
+let db = null, gifts = [], settings = {title:"",sub:"",rels:DEFAULT_RELS}, cash = {};
+let editingId = null, side = "신부측", giftGiven = false, sortKey = "no", sortDir = 1;
+let canWrite = true;
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
+function confirmBox(msg){ return new Promise(res=>{ $("#modalMsg").textContent=msg; $("#modal").classList.add("show");
+  const done=v=>{ $("#modal").classList.remove("show"); $("#mYes").onclick=$("#mNo").onclick=null; res(v); };
+  $("#mYes").onclick=()=>done(true); $("#mNo").onclick=()=>done(false); }); }
+function setStatus(msg, bad){ const s=$("#status"); s.textContent=msg; s.classList.toggle("bad",!!bad); }
+
+// ---------- tabs ----------
+$$(".tabs button").forEach(b=>b.onclick=()=>{
+  $$(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  ["input","list","sum"].forEach(t=>$("#tab-"+t).classList.toggle("hidden",t!==b.dataset.tab));
+});
+
+// ---------- form chips ----------
+function segSetup(id, cb){ $$("#"+id+" button").forEach(b=>b.onclick=()=>{ $$("#"+id+" button").forEach(x=>x.classList.toggle("on",x===b)); cb(b.dataset.v); }); }
+function segSet(id, v){ $$("#"+id+" button").forEach(x=>x.classList.toggle("on",x.dataset.v===String(v))); }
+segSetup("f-side", v=>side=v);
+segSetup("f-gift", v=>giftGiven = v==="1");
+
+$("#amtChips").innerHTML = AMTS.map(a=>`<button type="button" class="chip" data-a="${a}">${a}만</button>`).join("");
+$("#amtChips").onclick = e=>{ const b=e.target.closest(".chip"); if(!b) return; $("#f-amt").value=b.dataset.a; updateAmt(); };
+function amtWon(){ const v=parseFloat(String($("#f-amt").value).replace(/,/g,"")); return isNaN(v)?0:Math.round(v*10000); }
+function updateAmt(){
+  const w=amtWon(); $("#amtPreview").textContent = w ? "= "+won(w) : "";
+  $$("#amtChips .chip").forEach(c=>c.classList.toggle("on", +c.dataset.a*10000===w));
+}
+$("#f-amt").oninput = updateAmt;
+
+function renderRelChips(){
+  const cur=$("#f-rel").value.trim();
+  $("#relChips").innerHTML = (settings.rels||DEFAULT_RELS).map(r=>`<button type="button" class="chip ${r===cur?"on":""}" data-r="${esc(r)}">${esc(r)}</button>`).join("");
+}
+$("#relChips").onclick = e=>{ const b=e.target.closest(".chip"); if(!b) return; $("#f-rel").value=b.dataset.r; renderRelChips(); };
+$("#f-rel").oninput = renderRelChips;
+
+$("#f-name").oninput = ()=>{
+  const n=$("#f-name").value.trim(); const w=$("#dupWarn");
+  const d = n && gifts.filter(g=>g.name===n && g.id!==editingId);
+  if(d && d.length){ w.textContent=`⚠ 같은 이름이 이미 있어요: ${d.map(g=>`${g.no}번 ${manwon(g.amount)}${g.rel?" ("+g.rel+")":""}`).join(", ")} — 동명이인이면 관계를 꼭 적어주세요`; w.classList.remove("hidden"); }
+  else w.classList.add("hidden");
+};
+
+function nextNo(){ return gifts.reduce((m,g)=>Math.max(m,g.no||0),0)+1; }
+function resetForm(){
+  editingId=null; $("#form").reset(); $("#f-no").placeholder="자동 ("+nextNo()+")";
+  giftGiven=false; segSet("f-gift","0"); segSet("f-side",side);
+  $("#editBadge").classList.add("hidden"); $("#editBtns").classList.add("hidden");
+  $("#saveBtn").textContent="저장"; $("#formTitle").textContent="봉투 입력";
+  $("#dupWarn").classList.add("hidden"); updateAmt(); renderRelChips();
+}
+function startEdit(id){
+  const g=gifts.find(x=>x.id===id); if(!g) return;
+  editingId=id;
+  $("#f-no").value=g.no||""; $("#f-name").value=g.name||""; $("#f-amt").value=g.amount?g.amount/10000:"";
+  $("#f-rel").value=g.rel||""; $("#f-ticket").value=g.ticket||""; $("#f-memo").value=g.memo||"";
+  side=g.side||"신부측"; segSet("f-side",side); giftGiven=!!g.gift; segSet("f-gift",giftGiven?"1":"0");
+  $("#editBadge").classList.remove("hidden"); $("#editBtns").classList.remove("hidden");
+  $("#saveBtn").textContent="수정 저장"; $("#formTitle").textContent=`${g.no}번 봉투 수정`;
+  updateAmt(); renderRelChips();
+  $$(".tabs button")[0].click(); window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#cancelEdit").onclick = resetForm;
+$("#delBtn").onclick = async ()=>{
+  const g=gifts.find(x=>x.id===editingId); if(!g) return;
+  if(!await confirmBox(`${g.no}번 ${g.name} (${manwon(g.amount)}) 기록을 삭제할까요?`)) return;
+  try{ await removeGift(g.id); toast("삭제했어요"); resetForm(); }catch(e){ handleErr(e); }
+};
+
+$("#form").onsubmit = async e=>{
+  e.preventDefault();
+  const name=$("#f-name").value.trim(); const amount=amtWon();
+  if(!name){ toast("이름을 입력해주세요"); $("#f-name").focus(); return; }
+  if(!amount){ toast("금액을 입력해주세요"); $("#f-amt").focus(); return; }
+  let no = toInt($("#f-no").value) || (editingId ? (gifts.find(x=>x.id===editingId)||{}).no : nextNo());
+  const clash = gifts.find(g=>g.no===no && g.id!==editingId);
+  if(clash && !await confirmBox(`${no}번은 이미 ${clash.name}님으로 쓰였어요. 그래도 저장할까요?`)) return;
+  const prev = editingId ? gifts.find(x=>x.id===editingId) : null;
+  const rec = { no, name, side, amount, rel:$("#f-rel").value.trim(), ticket:toInt($("#f-ticket").value),
+    gift:giftGiven, memo:$("#f-memo").value.trim(), thanked: prev ? !!prev.thanked : false,
+    createdAt: prev ? prev.createdAt : Date.now(), updatedAt: Date.now() };
+  $("#saveBtn").disabled=true;
+  try{
+    await saveGift(editingId, rec);
+    toast(editingId ? "수정했어요" : `${no}번 ${name} · ${manwon(amount)} 저장`);
+    resetForm(); $("#f-name").focus();
+  }catch(err){ handleErr(err); }
+  $("#saveBtn").disabled=false;
+};
+
+// ---------- data layer (offline: this PC + backup file) ----------
+const LS_KEY="chukui-ledger-v1";
+let trash=[];
+const newId=()=>"g"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function snapshot(){ return {app:"축의금 장부",version:1,savedAt:new Date().toISOString(),gifts,settings,cash,trash}; }
+function getMeta(){ try{ return JSON.parse(localStorage.getItem(LS_KEY+"-meta")||"{}"); }catch(e){ return {}; } }
+function setMeta(m){ try{ localStorage.setItem(LS_KEY+"-meta", JSON.stringify({...getMeta(),...m})); }catch(e){} }
+function persist(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(snapshot())); setMeta({changes:(getMeta().changes||0)+1}); }
+  catch(e){ toast("⚠ 저장에 실패했어요. 지금 바로 '백업 보내기'를 해주세요"); }
+  setBackupState();
+}
+async function saveGift(id, rec){
+  if(id){ gifts=gifts.map(g=>g.id===id?{...rec,id}:g); } else gifts.push({...rec,id:newId()});
+  persist(); renderAll();
+}
+async function removeGift(id){
+  const g=gifts.find(x=>x.id===id); if(g) trash.push({...g,deletedAt:Date.now()});
+  gifts=gifts.filter(g=>g.id!==id); persist(); renderAll();
+}
+async function toggleThanks(id){
+  const g=gifts.find(x=>x.id===id); if(!g) return;
+  gifts=gifts.map(x=>x.id===id?{...x,thanked:!x.thanked}:x); persist(); renderAll();
+}
+function handleErr(e){ toast("저장 중 문제가 생겼어요"); console.error(e); }
+
+// backup via iPad share sheet (Files / KakaoTalk / AirDrop / Mail)
+const pad=n=>String(n).padStart(2,"0");
+function stampName(base, ext){ const d=new Date(); return `${base}_${d.getMonth()+1}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`; }
+function baseName(){ return (settings.title||"축의금 장부").replace(/[\\/:*?"<>|♥]/g,"").trim()||"축의금 장부"; }
+async function shareOrDownload(blob, filename, mime){
+  const file = new File([blob], filename, {type:mime});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:filename}); return true; }
+    catch(e){ if(e && e.name==="AbortError") return false; }
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },4000);
+  return true;
+}
+function setBackupState(){
+  const box=$("#backupBox"), st=$("#backupState"); if(!box) return;
+  const m=getMeta(), changes=m.changes||0, since=changes-(m.backupAt||0);
+  box.classList.remove("ok","need");
+  if(!gifts.length){ st.textContent="입력한 내용은 이 아이패드에 자동 저장돼요 (인터넷 필요 없음)"; return; }
+  if(m.lastBackup && since<=0){ box.classList.add("ok"); st.textContent=`✓ 마지막 백업 ${m.lastBackup} · 이후 변경 없음`; }
+  else if(m.lastBackup){ box.classList.toggle("need", since>=20); st.textContent=`마지막 백업 ${m.lastBackup} · 그 뒤로 ${since}번 변경됨${since>=20?" → 백업을 한 번 보내두세요":""}`; }
+  else { box.classList.toggle("need", gifts.length>=10); st.textContent=`이 아이패드에 자동 저장 중 · 아직 백업 안 함${gifts.length>=10?" → '백업 보내기'로 카톡·파일 앱에 한 부 보내두세요":""}`; }
+}
+$("#linkBtn").onclick = async ()=>{
+  const blob=new Blob([JSON.stringify(snapshot(),null,1)],{type:"application/json"});
+  const ok=await shareOrDownload(blob, stampName(baseName()+" 백업","json"), "application/json");
+  if(ok){ setMeta({backupAt:getMeta().changes||0, lastBackup:new Date().toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}); setBackupState(); toast("백업을 보냈어요"); }
+};
+$("#loadBtn").onclick = ()=>$("#loadFile").click();
+$("#loadFile").onchange = async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!d || !Array.isArray(d.gifts)) throw 0;
+    if(gifts.length && !await confirmBox(`지금 화면의 ${gifts.length}건을 백업 파일의 ${d.gifts.length}건으로 바꿀까요?`)) return;
+    gifts=d.gifts; settings={...settings,...(d.settings||{})}; cash=d.cash||{}; trash=d.trash||[];
+    persist(); applySettings(); renderAll(); toast(`${gifts.length}건을 불러왔어요`);
+  }catch(err){ toast("축의금 장부 백업 파일이 아니에요"); }
+};
+
+// ---------- list ----------
+$$("th[data-sort]").forEach(th=>th.onclick=()=>{ const k=th.dataset.sort; if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=(k==="amount")?-1:1; } renderList(); });
+["#q","#fSide","#fRel"].forEach(s=>$(s).addEventListener("input",renderList));
+
+function filtered(){
+  const q=$("#q").value.trim().toLowerCase(), fs=$("#fSide").value, fr=$("#fRel").value;
+  return gifts.filter(g=>(!fs||g.side===fs)&&(!fr||g.rel===fr)&&(!q||[g.name,g.rel,g.memo,String(g.no)].join(" ").toLowerCase().includes(q)))
+    .sort((a,b)=>{ const x=a[sortKey]??"", y=b[sortKey]??""; return (typeof x==="number"&&typeof y==="number"? x-y : String(x).localeCompare(String(y),"ko"))*sortDir; });
+}
+function renderList(){
+  const rows=filtered();
+  $("#listCount").textContent=`${rows.length}건 · ${won(rows.reduce((s,g)=>s+g.amount,0))}`;
+  $("#tbody").innerHTML = rows.length ? rows.map(g=>`
+    <tr class="item" data-id="${esc(g.id)}">
+      <td class="num">${g.no}</td>
+      <td><div>${esc(g.name)} ${g.side==="신랑측"?'<span class="tag groom">신랑측</span>':""}</div>
+        ${g.memo||g.gift?`<div class="memo">${g.gift?"답례품 · ":""}${esc(g.memo)}</div>`:""}
+        <div class="memo" style="display:none" data-m>${esc(g.rel)}</div></td>
+      <td class="hide-m">${g.rel?`<span class="tag">${esc(g.rel)}</span>`:""}</td>
+      <td class="num">${manwon(g.amount)}</td>
+      <td class="num hide-m">${g.ticket||""}</td>
+      <td><button class="thx ${g.thanked?"on":""}" data-thx="${esc(g.id)}" aria-label="감사 인사 완료">✓</button></td>
+    </tr>`).join("") : `<tr><td colspan="6"><div class="empty">${gifts.length?"검색 결과가 없어요":"아직 입력된 봉투가 없어요"}</div></td></tr>`;
+  $$("th[data-sort]").forEach(th=>{ th.textContent=th.textContent.replace(/ [▲▼]$/,""); if(th.dataset.sort===sortKey) th.textContent+= sortDir>0?" ▲":" ▼"; });
+  if(window.matchMedia("(max-width:520px)").matches) $$("[data-m]").forEach(d=>{ if(d.textContent) d.style.display="block"; });
+}
+$("#tbody").onclick = e=>{
+  const t=e.target.closest("[data-thx]"); if(t){ e.stopPropagation(); toggleThanks(t.dataset.thx); return; }
+  const tr=e.target.closest("tr.item"); if(tr) startEdit(tr.dataset.id);
+};
+function renderRelFilter(){
+  const rels=[...new Set(gifts.map(g=>g.rel).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko"));
+  const cur=$("#fRel").value;
+  $("#fRel").innerHTML = `<option value="">모든 관계</option>`+rels.map(r=>`<option ${r===cur?"selected":""}>${esc(r)}</option>`).join("");
+}
+
+// ---------- export ----------
+function tableRows(){
+  return [...gifts].sort((a,b)=>a.no-b.no).map(g=>({"번호":g.no,"이름":g.name,"구분":g.side,"관계":g.rel,"금액":g.amount,"식권":g.ticket||0,"답례품":g.gift?"O":"","감사인사":g.thanked?"완료":"","메모":g.memo}));
+}
+$("#copyBtn").onclick = async ()=>{
+  const rows=tableRows(); if(!rows.length){ toast("복사할 내용이 없어요"); return; }
+  const head=Object.keys(rows[0]); const tsv=[head.join("\t"),...rows.map(r=>head.map(h=>String(r[h]??"").replace(/\t|\n/g," ")).join("\t"))].join("\n");
+  try{ await navigator.clipboard.writeText(tsv); toast("복사했어요. 엑셀에 붙여넣기 하세요"); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=tsv; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("복사했어요. 엑셀에 붙여넣기 하세요"); }catch(_){ toast("복사가 막혀 있어요. 엑셀 저장을 써주세요"); } ta.remove(); }
+};
+$("#xlsxBtn").onclick = async ()=>{
+  const rows=tableRows(); if(!rows.length){ toast("저장할 내용이 없어요"); return; }
+  if(!window.XLSX){ toast("엑셀 모듈을 불러오지 못했어요. 표 복사를 써주세요"); return; }
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[{wch:6},{wch:14},{wch:8},{wch:12},{wch:11},{wch:6},{wch:7},{wch:9},{wch:30}];
+  rows.forEach((_,i)=>{ const c=ws["E"+(i+2)]; if(c) c.z="#,##0"; });
+  XLSX.utils.book_append_sheet(wb,ws,"명단");
+  const s=stats();
+  const sum=[["항목","값"],["총 축의금",s.total],["봉투 수",s.count],["평균",Math.round(s.avg)],["식권 지급",s.tickets],[],["관계","건수","합계"],...s.byRel.map(r=>[r.k,r.n,r.sum])];
+  const ws2=XLSX.utils.aoa_to_sheet(sum); ws2["!cols"]=[{wch:14},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws2,"합계");
+  const buf=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+  const fname=(settings.title||"축의금 장부").replace(/[\\/:*?"<>|♥]/g,"").trim()+".xlsx";
+  const mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  try{ const ok=await shareOrDownload(new Blob([buf],{type:mime}), stampName(baseName(),"xlsx"), mime); if(ok) toast("엑셀 파일을 만들었어요"); }catch(e){ toast("저장하지 못했어요"); }
+};
+
+// ---------- summary ----------
+function stats(){
+  const total=gifts.reduce((s,g)=>s+g.amount,0), count=gifts.length;
+  const group=f=>{ const m={}; gifts.forEach(g=>{ const k=f(g); (m[k]=m[k]||{k,n:0,sum:0}); m[k].n++; m[k].sum+=g.amount; }); return Object.values(m).sort((a,b)=>b.sum-a.sum); };
+  const bucket=a=>a<50000?"5만원 미만":a<100000?"5만원~10만원 미만":a<200000?"10만원~20만원 미만":a<500000?"20만원~50만원 미만":"50만원 이상";
+  const order=["5만원 미만","5만원~10만원 미만","10만원~20만원 미만","20만원~50만원 미만","50만원 이상"];
+  return { total, count, avg:count?total/count:0, tickets:gifts.reduce((s,g)=>s+(g.ticket||0),0),
+    thanked:gifts.filter(g=>g.thanked).length,
+    byRel:group(g=>g.rel||"미기재"), bySide:group(g=>g.side||"신부측"),
+    byAmt:group(g=>bucket(g.amount)).sort((a,b)=>order.indexOf(a.k)-order.indexOf(b.k)) };
+}
+function bars(el, list, by){
+  const max=Math.max(1,...list.map(r=>r[by]));
+  $(el).innerHTML = list.length ? list.map(r=>`<div class="bar-row"><div>${esc(r.k)}</div><div class="bar"><i style="width:${r[by]/max*100}%"></i></div><div class="r"><b>${by==="sum"?manwon(r.sum):r.n+"건"}</b> · ${by==="sum"?r.n+"건":manwon(r.sum)}</div></div>`).join("") : `<div class="empty">데이터가 없어요</div>`;
+}
+function renderSum(){
+  const s=stats();
+  $("#kTotal").textContent=won(s.total); $("#kCount").textContent=s.count+"건"; $("#kAvg").textContent=manwon(Math.round(s.avg/1000)*1000);
+  $("#kTicket").textContent=s.tickets+"장"; $("#kThx").textContent=`${s.thanked} / ${s.count}`;
+  bars("#sideBars",s.bySide,"sum"); $("#sideCard").classList.toggle("hidden", s.bySide.length<2);
+  bars("#relBars",s.byRel,"sum"); bars("#amtBars",s.byAmt,"n");
+  renderCash(s.total);
+}
+function renderCash(total){
+  if(total===undefined) total=stats().total;
+  let counted=0, any=false;
+  $$("[data-cash]").forEach(i=>{ if(document.activeElement!==i) i.value = cash[i.dataset.cash] ? cash[i.dataset.cash] : ""; });
+  Object.entries(cash).forEach(([k,v])=>{ if(v){ any=true; counted += k==="etc" ? v : (+k)*v; } });
+  const d=$("#cashDiff");
+  if(!any){ d.className="diff"; d.style.background="var(--accent-l)"; d.innerHTML=`<span>장부 합계</span><b>${won(total)}</b>`; return; }
+  d.style.background="";
+  const diff=counted-total;
+  d.className="diff "+(diff===0?"ok":"bad");
+  d.innerHTML = `<span>세어본 금액 ${won(counted)}<br>장부 합계 ${won(total)}</span><b style="align-self:center">${diff===0?"✓ 일치":(diff>0?"+":"")+won(diff)}</b>`;
+}
+let cashTimer=null;
+$$("[data-cash]").forEach(i=>i.addEventListener("input",()=>{
+  cash[i.dataset.cash]=toInt(i.value); renderCash();
+  clearTimeout(cashTimer); cashTimer=setTimeout(persist,500);
+}));
+
+// ---------- settings ----------
+function applySettings(){
+  $("#title").textContent = settings.title || "축의금 장부";
+  $("#subtitle").textContent = settings.sub || "봉투 받는 대로 바로 입력하세요";
+  document.title = settings.title || "축의금 장부";
+  if(document.activeElement!==$("#s-title")) $("#s-title").value=settings.title||"";
+  if(document.activeElement!==$("#s-sub")) $("#s-sub").value=settings.sub||"";
+  if(document.activeElement!==$("#s-rels")) $("#s-rels").value=(settings.rels||DEFAULT_RELS).join(", ");
+  renderRelChips();
+}
+$("#saveSettings").onclick = async ()=>{
+  const next={ title:$("#s-title").value.trim(), sub:$("#s-sub").value.trim(),
+    rels:$("#s-rels").value.split(",").map(s=>s.trim()).filter(Boolean) };
+  if(!next.rels.length) next.rels=DEFAULT_RELS;
+  settings=next; applySettings();
+  persist(); toast("설정을 저장했어요");
+};
+
+function renderRecent(){
+  const r=[...gifts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+  $("#recent").innerHTML = r.length ? `<div style="border:0;padding-bottom:2px"><span>최근 입력</span><span>총 ${gifts.length}건 · ${won(stats().total)}</span></div>`+
+    r.map(g=>`<div><span>${g.no}번 ${esc(g.name)}${g.rel?" · "+esc(g.rel):""}</span><span>${manwon(g.amount)}</span></div>`).join("") : "";
+}
+function renderAll(){
+  renderRelFilter(); renderList(); renderSum(); renderRecent();
+  if(!editingId) $("#f-no").placeholder="자동 ("+nextNo()+")";
+}
+
+// ---------- boot ----------
+try{
+  const raw=localStorage.getItem(LS_KEY);
+  if(raw){ const d=JSON.parse(raw); gifts=d.gifts||[]; settings={...settings,...(d.settings||{})}; cash=d.cash||{}; trash=d.trash||[]; }
+  setStatus("● 인터넷 없이 동작 · 이 아이패드에 자동 저장");
+}catch(e){ setStatus("⚠ 저장 공간을 쓸 수 없어요. 사파리 '개인정보 보호 브라우징'이면 꺼주세요", true); }
+resetForm(); applySettings(); renderAll(); setBackupState();
+const standalone = window.navigator.standalone===true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+const isApple = /iPad|iPhone|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
+if(isApple && !standalone) $("#installBox").style.display="block";
+if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+})();
+</script>
+</body>
+</html>
